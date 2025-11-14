@@ -5,7 +5,7 @@ using testFR.ViewModels;
 
 namespace testFR.DAL
 {
-    public class StudentsDataAccessLayer : IStudentsRepository
+    public class StudentsDataAccessLayer
     {
         private readonly AppDbContext _context;
 
