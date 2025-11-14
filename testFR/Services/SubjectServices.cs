@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using testFR.DAL;
 using testFR.Interfaces;
+using testFR.Models;
 using testFR.ViewModels;
 
 namespace testFR.Services
@@ -42,6 +43,15 @@ namespace testFR.Services
             return await _studentsDataAccessLayer.DeleteSubjectAsync(sub_id);
         }
 
+        public async Task<List<Subjects>> GetAllSubjectListAsync()
+        {
+            var data = await _studentsDataAccessLayer.GetAllSubjectListAsync();
+            if(data  == null || data.Count == 0)
+            {
+                return new List<Subjects>();
+            }
+            return data;
+        }
 
         public async Task<List<StudentDetailsViewModel>> GetStudentDetailsAsync()
         {

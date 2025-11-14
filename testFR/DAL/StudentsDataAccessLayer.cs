@@ -80,6 +80,12 @@ namespace testFR.DAL
             }
         }
 
+        public async Task<List<Subjects>> GetAllSubjectListAsync()
+        {
+            return await _context.Subjects.AsNoTracking().OrderBy(sub => sub.Sub_id).ToListAsync();  
+                
+        }
+
         // JOIN QUERY
         public async Task<List<StudentDetailsViewModel>> GetStudentDetailsAsync()
         {
