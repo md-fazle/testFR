@@ -11,10 +11,21 @@ namespace testFR.Controllers
         {
             this.subjectServices = subjectServices;
         }
+
+        /// <summary>
+        /// for students
+        /// </summary>
+        /// <returns></returns>
         public IActionResult Index()
         {
             return View();
         }
+
+
+        /// <summary>
+        ///  Subjects 
+        /// </summary>
+        /// <returns></returns>
 
         [HttpGet]
         public async Task<IActionResult> SubjectList()
@@ -23,6 +34,8 @@ namespace testFR.Controllers
 
             return View(result);
         }
+
+
 
         [HttpGet]
         public IActionResult CreateSubject()
@@ -41,7 +54,7 @@ namespace testFR.Controllers
             var result = await subjectServices.InsertSubjects(subjects.Sub_id, subjects.Sub_Name);
             if (result)
             {
-                return RedirectToAction("Index");
+                return RedirectToAction("SubjectList");
             }
             ModelState.AddModelError("", "Faild to add subject");
             return View(subjects);
@@ -61,7 +74,7 @@ namespace testFR.Controllers
             if (result)
             {
 
-                return RedirectToAction("Index");
+                return RedirectToAction("SubjectList");
             }
             ModelState.AddModelError("", "Faild to Edit subject");
      
@@ -76,7 +89,7 @@ namespace testFR.Controllers
             var result = await subjectServices.DeleteSubject(sub_id);
             if (result)
             {
-                return RedirectToAction("Index");
+                return RedirectToAction("SubjectList");
             }
             ModelState.AddModelError("", "Faild to Edit subject");
             return View();
