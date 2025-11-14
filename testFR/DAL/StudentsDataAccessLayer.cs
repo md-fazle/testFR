@@ -1,108 +1,102 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.Xml;
 using testFR.Data;
-using testFR.Migrations;
 using testFR.Models;
 using testFR.ViewModels;
 
 namespace testFR.DAL
 {
-    public class StudentsDataAccessLayer
+    public class StudentsDataAccessLayer : IStudentsRepository
     {
+        private readonly AppDbContext _context;
 
-        private readonly AppDbContext _appDbContext;
-
-        public StudentsDataAccessLayer(AppDbContext appDbContext)
+        public StudentsDataAccessLayer(AppDbContext context)
         {
-            _appDbContext = appDbContext;   
+            _context = context;
         }
 
-        public async Task<bool>InsertSubjects(int sub_id, string sub_name)
+        // INSERT SUBJECT
+        public async Task<bool> InsertSubjectAsync(int subId, string subName)
         {
             try
             {
                 var subject = new Subjects
                 {
-                    Sub_id = sub_id,
-                    Sub_Name = sub_name
+                    Sub_id = subId,
+                    Sub_Name = subName
                 };
-                _appDbContext.Add(subject);
-                await _appDbContext.SaveChangesAsync();
+
+                await _context.Subjects.AddAsync(subject);
+                await _context.SaveChangesAsync();
                 return true;
-
             }
-            catch { 
-              
+            catch (Exception ex)
+            {
+                Console.WriteLine($"InsertSubject Error: {ex.Message}");
                 return false;
-               
             }
-            
         }
 
-        public async Task<bool> UpdateSubjects(int sub_id, string sub_name)
+        // UPDATE SUBJECT
+        public async Task<bool> UpdateSubjectAsync(int subId, string subName)
         {
             try
-            { 
-                var UpSubject = await _appDbContext.Subjects.FirstOrDefaultAsync(s=>s.Sub_id == sub_id);
-                if(UpSubject == null)
-                {
-                    return false;
-                }
-                else
-                {
-                    UpSubject.Sub_Name = sub_name;
-                    await _appDbContext.SaveChangesAsync();
-                    return true;
-
-                }
-            }
-            catch
             {
+                var subject = await _context.Subjects.FirstOrDefaultAsync(s => s.Sub_id == subId);
+
+                if (subject == null)
+                    return false;
+
+                subject.Sub_Name = subName;
+
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"UpdateSubject Error: {ex.Message}");
                 return false;
             }
         }
 
-        public async Task<bool> DeleteSubject(int sub_id)
+        // DELETE SUBJECT
+        public async Task<bool> DeleteSubjectAsync(int subId)
         {
-
             try
             {
-                var DelStudent = await _appDbContext.Subjects.FirstOrDefaultAsync(s=>s.Sub_id == sub_id);
-                if(DelStudent == null)
-                {
+                var subject = await _context.Subjects.FirstOrDefaultAsync(s => s.Sub_id == subId);
+
+                if (subject == null)
                     return false;
-                }
-                else
-                {
-                    _appDbContext.Subjects.Remove(DelStudent);
-                    await _appDbContext.SaveChangesAsync();
-                    return true;
-                }
+
+                _context.Subjects.Remove(subject);
+                await _context.SaveChangesAsync();
+
+                return true;
             }
-            catch
+            catch (Exception ex)
             {
+                Console.WriteLine($"DeleteSubject Error: {ex.Message}");
                 return false;
             }
-
         }
+
+        // JOIN QUERY
         public async Task<List<StudentDetailsViewModel>> GetStudentDetailsAsync()
         {
-            var studentDetails = await (from s in _appDbContext.Students join m in _appDbContext.StudentMarks
-                                        on s.S_id equals m.S_id join sub in _appDbContext.Subjects on m.Sub_id equals sub.Sub_id
-                                        select new StudentDetailsViewModel
-                                        {
-                                            S_id = s.S_id,
-                                            Name = s.Name,
-                                            Email = s.Email,
-                                            Phone = s.Phone,
-                                            Sub_Name = sub.Sub_Name,
-                                            S_Mark = m.S_Mark
-
-                                        }).ToListAsync();
-
-            return studentDetails;
+            return await (
+                from s in _context.Students.AsNoTracking()
+                join m in _context.StudentMarks.AsNoTracking() on s.S_id equals m.S_id
+                join sub in _context.Subjects.AsNoTracking() on m.Sub_id equals sub.Sub_id
+                select new StudentDetailsViewModel
+                {
+                    S_id = s.S_id,
+                    Name = s.Name,
+                    Email = s.Email,
+                    Phone = s.Phone,
+                    Sub_Name = sub.Sub_Name,
+                    S_Mark = m.S_Mark
+                }
+            ).ToListAsync();
         }
-
-
     }
 }
