@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="en" ng-app="testFRApp">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -30,7 +30,8 @@
             </div>
         </nav>
     </header>
-    <div class="container">
+
+    <div class="container" ng-controller="MainController">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
@@ -41,8 +42,25 @@
             &copy; 2025 - testFR - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
+
+    <!-- Scripts -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- AngularJS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular.min.js"></script>
+
+    <!-- AngularJS App -->
+    <script>
+        // Define AngularJS module
+        var app = angular.module('testFRApp', []);
+
+        // Main controller
+        app.controller('MainController', ['$scope', function($scope) {
+            $scope.message = "Welcome to testFR powered by AngularJS!";
+        }]);
+    </script>
+
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
