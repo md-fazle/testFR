@@ -1,5 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
+using System.Data;
 using testFR.Data;
+using testFR.Data.DbConnection;
 using testFR.Models;
 using testFR.ViewModels;
 
@@ -8,10 +11,12 @@ namespace testFR.DAL
     public class StudentsDataAccessLayer
     {
         private readonly AppDbContext _context;
+        private readonly DbConnection _dbConnection;
 
-        public StudentsDataAccessLayer(AppDbContext context)
+        public StudentsDataAccessLayer(AppDbContext context , DbConnection dbConnection)
         {
             _context = context;
+            _dbConnection = dbConnection;
         }
 
         // INSERT SUBJECT
@@ -86,7 +91,7 @@ namespace testFR.DAL
                 
         }
 
-        // JOIN QUERY
+        // JOIN QUERY Using LinQ
         public async Task<List<StudentDetailsViewModel>> GetStudentDetailsAsync()
         {
             return await (
@@ -104,5 +109,83 @@ namespace testFR.DAL
                 }
             ).ToListAsync();
         }
+
+
+
+
+
+
+
+
+        ///////////////////// ADO.NET ################################### Derect Query 
+        
+        public async Task<List<Student>> GetAllStudentList()
+        {
+           var students  = new List<Student>();
+
+            const string query = @"select s.S_id,s.Name,s.Email,s.Phone from dbo.Students s";
+
+            using var con = await _dbConnection.CreateOpenConnectionAsync();
+
+            using var cmd = new SqlCommand(query, con);
+            using var reader = await cmd.ExecuteReaderAsync();
+
+            while (await reader.ReadAsync())
+            {
+                var st = new Student
+                {
+                    S_id = reader.GetString(reader.GetOrdinal("S_id")),
+                    Name = reader.GetString(reader.GetOrdinal("Name")),
+                    Email = reader.GetString(reader.GetOrdinal("Email")),
+                    Phone = reader.GetString(reader.GetOrdinal("Phone"))
+                };
+                students.Add(st);
+            }
+            return students;
+        }
+
+        public async Task<bool> InsertAllStudentAsync(Student student)
+        {
+            const string query = @"
+                INSERT INTO Students (S_id, Name, Email, Phone)
+                VALUES (@S_id, @Name, @Email, @Phone);
+            ";
+
+            using var connection = await _dbConnection.CreateOpenConnectionAsync();
+            using var cmd = new SqlCommand(query, connection);
+
+            cmd.Parameters.Add(new SqlParameter("@S_id", SqlDbType.NVarChar, 20) { Value = student.S_id });
+            cmd.Parameters.Add(new SqlParameter("@Name", SqlDbType.NVarChar, 100) { Value = student.Name });
+            cmd.Parameters.Add(new SqlParameter("@Email", SqlDbType.NVarChar, 150) { Value = student.Email });
+            cmd.Parameters.Add(new SqlParameter("@Phone", SqlDbType.NVarChar, 11) { Value = student.Phone });
+
+            var rows = await cmd.ExecuteNonQueryAsync();
+            return rows > 0;
+        }
+
+
+
+
+
+          //############### ADO.NET  Store Procedure Programming ########################
+
+        public async Task<bool>InsertStudentsAsync(Student student)
+        {
+            using var  con = await _dbConnection.CreateOpenConnectionAsync();
+            using var cmd = new SqlCommand("sp_InsertStudent", con)
+            {
+                CommandType = CommandType.StoredProcedure
+            };
+            cmd.Parameters.Add(new SqlParameter("@S_id",SqlDbType.NVarChar, 20) {Value = student.S_id});
+            cmd.Parameters.Add(new SqlParameter("@Name", SqlDbType.NVarChar, 100) {Value = student.Name});
+            cmd.Parameters.Add(new SqlParameter("@Email", SqlDbType.NVarChar, 150) {Value = student.Email});
+            cmd.Parameters.Add(new SqlParameter("@Phone", SqlDbType.NVarChar, 15) {Value = student.Phone});
+
+            var rows = await cmd.ExecuteNonQueryAsync();
+            return rows > 0;
+        }
+
+
+
     }
 }
