@@ -30,9 +30,8 @@ namespace testFR.Controllers
         [HttpGet]
         public async Task<IActionResult> SubjectList()
         {
-            var result = await subjectServices.GetAllSubjectListAsync();
-
-            return View(result);
+            var subjects = await subjectServices.GetAllSubjectListAsync();
+            return PartialView("SubjectList", subjects);
         }
 
 
@@ -46,19 +45,21 @@ namespace testFR.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateSubject(Subjects subjects)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                return View(subjects);
+            
+                return BadRequest(ModelState);
             }
 
             var result = await subjectServices.InsertSubjects(subjects.Sub_id, subjects.Sub_Name);
+
             if (result)
             {
-                return RedirectToAction("SubjectList");
+           
+                return Ok();
             }
-            ModelState.AddModelError("", "Faild to add subject");
-            return View(subjects);
 
+            return BadRequest("Failed to add subject");
         }
 
         [HttpPost]

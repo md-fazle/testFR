@@ -1,0 +1,17 @@
+﻿@model testFR.Models.Subjects
+
+<form id="frmSubject">
+    <div class="mb-3">
+        <label asp-for="Sub_id" class="form-label"></label>
+        <input asp-for="Sub_id" class="form-control" />
+        <span asp-validation-for="Sub_id" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Sub_Name" class="form-label"></label>
+        <input asp-for="Sub_Name" class="form-control" />
+        <span asp-validation-for="Sub_Name" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary w-100">Save Subject</button>
+</form>

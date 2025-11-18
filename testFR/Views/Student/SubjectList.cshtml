@@ -1,5 +1,32 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
+﻿@model IEnumerable<testFR.Models.Subjects>
+
+<table class="table table-bordered table-striped">
+    <thead class="table-dark">
+        <tr>
+            <th>SL</th>
+            <th>Subject ID</th>
+            <th>Subject Name</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null && Model.Any())
+        {
+            int sl = 1;
+            foreach (var item in Model)
+            {
+                <tr>
+                    <td>@sl</td>
+                    <td>@item.Sub_id</td>
+                    <td>@item.Sub_Name</td>
+                </tr>
+                sl++;
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="3" class="text-center text-muted">No subjects found.</td>
+            </tr>
+        }
+    </tbody>
+</table>

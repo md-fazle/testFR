@@ -3,6 +3,8 @@ using Microsoft.Data.SqlClient;
 using System.Data.Common;
 using testFR.Data;
 using testFR.DAL;
+using testFR.Interfaces;
+using testFR.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +20,8 @@ builder.Services.AddScoped<DbConnection>(provider =>
 
 //data access layer 
 builder.Services.AddScoped<StudentsDataAccessLayer>();
+builder.Services.AddScoped<ISubjectServices, SubjectServices>();
+
 
 var app = builder.Build();
 
