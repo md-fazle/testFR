@@ -7,9 +7,11 @@ namespace testFR.Controllers
     public class StudentController : Controller
     {
         private readonly ISubjectServices subjectServices;
-        public StudentController(ISubjectServices subjectServices)
+        private readonly IStudentServices studentServices;
+        public StudentController(ISubjectServices subjectServices, IStudentServices studentServices)
         {
             this.subjectServices = subjectServices;
+            this.studentServices = studentServices;
         }
 
         /// <summary>
@@ -96,5 +98,37 @@ namespace testFR.Controllers
             return View();
 
         }
+
+        [HttpGet]
+
+        public async Task<IActionResult> StudentList()
+        {
+            var students = await studentServices.GetAllStudentListAsync();
+            return PartialView("StudentList", students);
+        }
+
+        [HttpPost]
+
+        public async Task<IActionResult> CreateStudent(Student student)
+        {
+            if (!ModelState.IsValid)
+            {
+
+                return BadRequest(ModelState);
+            }
+
+            var result = await studentServices.InsertStudentAsync(student);
+
+            if (result)
+            {
+
+                return Ok();
+            }
+            return BadRequest("Failed to add Students");
+
+        }
+
+
+
     }
 }

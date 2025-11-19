@@ -12,5 +12,7 @@ namespace testFR.Interfaces
         Task<List<Subjects>> GetAllSubjectListAsync();
         Task<List<StudentDetailsViewModel>> GetStudentDetailsAsync();
 
+        
+
     }
 }

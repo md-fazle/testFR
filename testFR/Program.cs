@@ -20,7 +20,10 @@ builder.Services.AddScoped<DbConnection>(provider =>
 
 //data access layer 
 builder.Services.AddScoped<StudentsDataAccessLayer>();
+//All Services
 builder.Services.AddScoped<ISubjectServices, SubjectServices>();
+builder.Services.AddScoped<IStudentServices, StudentServices>();
+
 
 
 var app = builder.Build();
