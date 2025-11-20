@@ -1,6 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Data.SqlClient;
-using System.Data.Common;
 using testFR.Data;
 using testFR.DAL;
 using testFR.Interfaces;
@@ -10,21 +8,19 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 
-// EF Core DbContext
+// DbContext
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// ADO.NET DbConnection using Microsoft.Data.SqlClient
-builder.Services.AddScoped<DbConnection>(provider =>
-    new SqlConnection(builder.Configuration.GetConnectionString("DefaultConnection")));
+// Register your custom DbConnection class
+builder.Services.AddScoped<testFR.Data.DbConnection.DbConnection>();
 
-//data access layer 
+// DAL
 builder.Services.AddScoped<StudentsDataAccessLayer>();
-//All Services
+
+// Services
 builder.Services.AddScoped<ISubjectServices, SubjectServices>();
 builder.Services.AddScoped<IStudentServices, StudentServices>();
-
-
 
 var app = builder.Build();
 
@@ -36,7 +32,6 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
 app.UseAuthorization();
 

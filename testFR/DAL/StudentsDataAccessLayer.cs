@@ -167,23 +167,33 @@ namespace testFR.DAL
 
 
 
-          //############### ADO.NET  Store Procedure Programming ########################
+        //############### ADO.NET  Store Procedure Programming ########################
 
-        public async Task<bool>InsertStudentsAsync(Student student)
+        public async Task<bool> InsertStudentsAsync(Student student)
         {
-            using var  con = await _dbConnection.CreateOpenConnectionAsync();
-            using var cmd = new SqlCommand("sp_InsertStudent", con)
+            try
             {
-                CommandType = CommandType.StoredProcedure
-            };
-            cmd.Parameters.Add(new SqlParameter("@S_id",SqlDbType.NVarChar, 20) {Value = student.S_id});
-            cmd.Parameters.Add(new SqlParameter("@Name", SqlDbType.NVarChar, 100) {Value = student.Name});
-            cmd.Parameters.Add(new SqlParameter("@Email", SqlDbType.NVarChar, 150) {Value = student.Email});
-            cmd.Parameters.Add(new SqlParameter("@Phone", SqlDbType.NVarChar, 15) {Value = student.Phone});
+                using var con = await _dbConnection.CreateOpenConnectionAsync();
+                using var cmd = new SqlCommand("sp_InsertStudent", con)
+                {
+                    CommandType = CommandType.StoredProcedure
+                };
+                cmd.Parameters.Add(new SqlParameter("@S_id", SqlDbType.NVarChar, 20) { Value = student.S_id });
+                cmd.Parameters.Add(new SqlParameter("@Name", SqlDbType.NVarChar, 100) { Value = student.Name });
+                cmd.Parameters.Add(new SqlParameter("@Email", SqlDbType.NVarChar, 150) { Value = student.Email });
+                cmd.Parameters.Add(new SqlParameter("@Phone", SqlDbType.NVarChar, 15) { Value = student.Phone });
 
-            var rows = await cmd.ExecuteNonQueryAsync();
-            return rows > 0;
+                await cmd.ExecuteNonQueryAsync();
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("DAL Error: " + ex.Message);
+                return false;
+            }
         }
+
 
 
 
